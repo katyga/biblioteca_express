@@ -180,6 +180,42 @@ app.delete('/aluno/:id', async (req, res) => {
   }
 });
 
+// Atualizar uma autor pelo id
+app.put('/autor/:id', async (req, res) => {
+  const id = req.params.id;
+  const { nome } = req.body;
+  try {
+    const result = await pool.query(
+      'UPDATE autor SET nome = $1 WHERE id = $2 RETURNING *',
+      [nome, id]
+    );
+    if (result.rows.length === 0) {
+      return res.status(404).send('autor não encontrada');
+    }
+    res.json(result.rows[0]);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Erro ao atualizar autor');
+  }
+});
+
+// Deletar uma aluno pelo id
+app.delete('/autor/:id', async (req, res) => {
+  const id = req.params.id;
+  try {
+    const result = await pool.query(
+      'DELETE FROM autor WHERE id = $1 RETURNING *',
+      [id]
+    );
+    if (result.rows.length === 0) {
+      return res.status(404).send('autor não encontrada');
+    }
+    res.send('autor deletada com sucesso');
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Erro ao deletar autor');
+  }
+});
 
 /*
 
